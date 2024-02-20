@@ -23,7 +23,7 @@ import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { DOWN_ARROW } from '@angular/cdk/keycodes';
 import { MAT_SELECTSEARCH_DEFAULT_OPTIONS, MatSelectSearchOptions } from './default-options';
 
-/* tslint:disable:component-selector */
+/* eslint-disable @angular-eslint/component-selector */
 
 interface Bank {
   id: string;

@@ -11,11 +11,13 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "polyfills": [
+              "zone.js"
+            ],
             "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
-            "polyfills": "src/polyfills.ts",
             "assets": [
               "src/assets",
               "src/favicon.ico"
@@ -59,26 +61,29 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "ngx-mat-select-search:build"
+            "buildTarget": "ngx-mat-select-search:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "ngx-mat-select-search:build:production"
+              "buildTarget": "ngx-mat-select-search:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "ngx-mat-select-search:build"
+            "buildTarget": "ngx-mat-select-search:build"
           }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
             "main": "src/test.ts",
             "karmaConfig": "./karma.conf.js",
-            "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.spec.json",
             "scripts": [],
             "styles": [
@@ -87,6 +92,15 @@
             "assets": [
               "src/assets",
               "src/favicon.ico"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
             ]
           }
         }
@@ -103,6 +117,9 @@
     }
   },
   "cli": {
-    "analytics": false
+    "schematicCollections": [
+      "@angular-eslint/schematics",
+      "@angular-eslint/schematics"
+    ]
   }
 }

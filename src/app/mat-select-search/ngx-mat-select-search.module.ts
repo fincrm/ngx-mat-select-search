@@ -5,21 +5,20 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { NgModule } from '@angular/core';
-import { MatSelectSearchComponent } from './mat-select-search.component';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { CommonModule } from '@angular/common';
+import { NgModule } from "@angular/core";
+import { MatSelectSearchComponent } from "./mat-select-search.component";
+import { MatButtonModule } from "@angular/material/button";
+import { MatCheckboxModule } from "@angular/material/checkbox";
+import { MatIconModule } from "@angular/material/icon";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { MatTooltipModule } from "@angular/material/tooltip";
+import { CommonModule } from "@angular/common";
 
-import { MatSelectSearchClearDirective } from './mat-select-search-clear.directive';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MatSelectNoEntriesFoundDirective } from './mat-select-no-entries-found.directive';
-import { MatDividerModule } from '@angular/material/divider';
+import { MatSelectSearchClearDirective } from "./mat-select-search-clear.directive";
+import { ReactiveFormsModule } from "@angular/forms";
+import { MatSelectNoEntriesFoundDirective } from "./mat-select-no-entries-found.directive";
 
-export const MatSelectSearchVersion = '7.0.5';
+export const MatSelectSearchVersion = "16.0.0";
 export { MatSelectSearchClearDirective };
 export { MatSelectNoEntriesFoundDirective };
 
@@ -32,18 +31,16 @@ export { MatSelectNoEntriesFoundDirective };
     MatIconModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
-    MatDividerModule,
   ],
   declarations: [
     MatSelectSearchComponent,
     MatSelectSearchClearDirective,
-    MatSelectNoEntriesFoundDirective
+    MatSelectNoEntriesFoundDirective,
   ],
   exports: [
     MatSelectSearchComponent,
     MatSelectSearchClearDirective,
-    MatSelectNoEntriesFoundDirective
-  ]
+    MatSelectNoEntriesFoundDirective,
+  ],
 })
-export class NgxMatSelectSearchModule {
-}
+export class NgxMatSelectSearchModule {}
