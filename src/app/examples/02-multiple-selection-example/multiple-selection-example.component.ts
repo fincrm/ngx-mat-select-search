@@ -2,17 +2,16 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { FormControl } from '@angular/forms';
 import { ReplaySubject, Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
-import { MatSelect } from '@angular/material/select';
+import { MatLegacySelect as MatSelect } from '@angular/material/legacy-select';
 
 import { Bank, BANKS } from '../demo-data';
 
 @Component({
   selector: 'app-multiple-selection-example',
   templateUrl: './multiple-selection-example.component.html',
-  styleUrls: ['./multiple-selection-example.component.scss']
+  styleUrls: ['./multiple-selection-example.component.scss'],
 })
 export class MultipleSelectionExampleComponent implements OnInit, AfterViewInit, OnDestroy {
-
   /** list of banks */
   protected banks: Bank[] = BANKS;
 
@@ -30,8 +29,7 @@ export class MultipleSelectionExampleComponent implements OnInit, AfterViewInit,
   /** Subject that emits when the component has been destroyed. */
   protected _onDestroy = new Subject<void>();
 
-
-  constructor() { }
+  constructor() {}
 
   ngOnInit() {
     // set initial selection
@@ -41,11 +39,9 @@ export class MultipleSelectionExampleComponent implements OnInit, AfterViewInit,
     this.filteredBanksMulti.next(this.banks.slice());
 
     // listen for search field value changes
-    this.bankMultiFilterCtrl.valueChanges
-      .pipe(takeUntil(this._onDestroy))
-      .subscribe(() => {
-        this.filterBanksMulti();
-      });
+    this.bankMultiFilterCtrl.valueChanges.pipe(takeUntil(this._onDestroy)).subscribe(() => {
+      this.filterBanksMulti();
+    });
   }
 
   ngAfterViewInit() {
@@ -61,16 +57,14 @@ export class MultipleSelectionExampleComponent implements OnInit, AfterViewInit,
    * Sets the initial value after the filteredBanks are loaded initially
    */
   protected setInitialValue() {
-    this.filteredBanksMulti
-      .pipe(take(1), takeUntil(this._onDestroy))
-      .subscribe(() => {
-        // setting the compareWith property to a comparison function
-        // triggers initializing the selection according to the initial value of
-        // the form control (i.e. _initializeSelection())
-        // this needs to be done after the filteredBanks are loaded initially
-        // and after the mat-option elements are available
-        this.multiSelect.compareWith = (a: Bank, b: Bank) => a && b && a.id === b.id;
-      });
+    this.filteredBanksMulti.pipe(take(1), takeUntil(this._onDestroy)).subscribe(() => {
+      // setting the compareWith property to a comparison function
+      // triggers initializing the selection according to the initial value of
+      // the form control (i.e. _initializeSelection())
+      // this needs to be done after the filteredBanks are loaded initially
+      // and after the mat-option elements are available
+      this.multiSelect.compareWith = (a: Bank, b: Bank) => a && b && a.id === b.id;
+    });
   }
 
   protected filterBanksMulti() {
@@ -86,9 +80,6 @@ export class MultipleSelectionExampleComponent implements OnInit, AfterViewInit,
       search = search.toLowerCase();
     }
     // filter the banks
-    this.filteredBanksMulti.next(
-      this.banks.filter(bank => bank.name.toLowerCase().indexOf(search) > -1)
-    );
+    this.filteredBanksMulti.next(this.banks.filter((bank) => bank.name.toLowerCase().indexOf(search) > -1));
   }
-
 }
