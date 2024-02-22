@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { combineLatest, merge, Observable, Subject } from 'rxjs';
 import { map, mapTo, scan, startWith } from 'rxjs/operators';
-import { MatLegacySelect as MatSelect } from '@angular/material/legacy-select';
+import { MatSelect } from '@angular/material/select';
 import { Bank } from '../demo-data';
 
 /**
@@ -16,19 +16,17 @@ import { Bank } from '../demo-data';
 export class InfiniteScrollExampleComponent implements OnInit, OnDestroy {
   @ViewChild('matSelectInfiniteScroll', { static: true })
   infiniteScrollSelect: MatSelect;
-
+  /** control for the selected bank id */
+  public bankCtrl: FormControl<string> = new FormControl<string>(null);
+  /** control for the MatSelect filter keyword */
+  public bankFilterCtrl: FormControl<string> = new FormControl<string>('');
+  /** number of items added per batch */
+  batchSize = 20;
   /** list with all available data, mocks some sort of backend data source */
   private mockBankList: Bank[] = Array.from({ length: 1000 }).map((_, i) => ({
     id: String(i),
     name: `Bank ${i}`,
   }));
-
-  /** control for the selected bank id */
-  public bankCtrl: FormControl<string> = new FormControl<string>(null);
-
-  /** control for the MatSelect filter keyword */
-  public bankFilterCtrl: FormControl<string> = new FormControl<string>('');
-
   /** list of data corresponding to the search input */
   private filteredData$: Observable<Bank[]> = this.bankFilterCtrl.valueChanges.pipe(
     startWith(''),
@@ -41,10 +39,6 @@ export class InfiniteScrollExampleComponent implements OnInit, OnDestroy {
       );
     }),
   );
-
-  /** number of items added per batch */
-  batchSize = 20;
-
   private incrementBatchOffset$: Subject<void> = new Subject<void>();
   private resetBatchOffset$: Subject<void> = new Subject<void>();
 

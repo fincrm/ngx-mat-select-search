@@ -22,9 +22,9 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "package-lock.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+            - v1-dependencies-{{ checksum "package-lock.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
 
       - run: DISABLE_OPENCOLLECTIVE=true
       - run: npm install
@@ -39,3 +39,36 @@ jobs:
       - run: npm run lint
       - run: npm run build.ci --prod
       - run: npm run build-lib
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - dist
+  deploy:
+    # see https://circleci.com/blog/deploying-documentation-to-github-pages-with-continuous-integration
+    docker:
+      - image: circleci/node:16
+    steps:
+      - checkout
+      - attach_workspace:
+          at: artifacts
+      - run:
+          name: Install and configure dependencies
+          command: |
+            npm install --silent gh-pages@6.0.0
+            git config user.email "ci-build@bithost.ch"
+            git config user.name "ci-build"
+      - add_ssh_keys:
+          fingerprints:
+            - '9a:12:bb:95:c2:8b:7a:be:29:42:99:34:06:4f:68:cd'
+      - run: node_modules/.bin/gh-pages --message "[ci skip] Updates" --dist artifacts/dist
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master

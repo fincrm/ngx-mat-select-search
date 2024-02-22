@@ -17,7 +17,7 @@ export const configurableDefaultOptions = [
   'searching',
 ] as const;
 
-export type ConfigurableDefaultOptions = typeof configurableDefaultOptions[number];
+export type ConfigurableDefaultOptions = (typeof configurableDefaultOptions)[number];
 
 /**
  * InjectionToken that can be used to specify global options. e.g.
@@ -36,7 +36,11 @@ export type ConfigurableDefaultOptions = typeof configurableDefaultOptions[numbe
  *
  * See the corresponding inputs of `MatSelectSearchComponent` for documentation.
  */
-export const MAT_SELECTSEARCH_DEFAULT_OPTIONS = new InjectionToken<MatSelectSearchOptions>('mat-selectsearch-default-options');
+export const MAT_SELECTSEARCH_DEFAULT_OPTIONS = new InjectionToken<MatSelectSearchOptions>(
+  'mat-selectsearch-default-options',
+);
 
 /** Global configurable options for MatSelectSearch. */
-export type MatSelectSearchOptions = Readonly<Partial<Pick<MatSelectSearchComponent, ConfigurableDefaultOptions>>>;
+export type MatSelectSearchOptions = Readonly<
+  Partial<Pick<MatSelectSearchComponent, ConfigurableDefaultOptions>>
+>;

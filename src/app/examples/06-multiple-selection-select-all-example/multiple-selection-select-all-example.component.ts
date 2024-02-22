@@ -2,7 +2,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { FormControl } from '@angular/forms';
 import { ReplaySubject, Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
-import { MatLegacySelect as MatSelect } from '@angular/material/legacy-select';
+import { MatSelect } from '@angular/material/select';
 
 import { Bank, BANKS } from '../demo-data';
 
@@ -12,27 +12,20 @@ import { Bank, BANKS } from '../demo-data';
   styleUrls: ['./multiple-selection-select-all-example.component.scss'],
 })
 export class MultipleSelectionSelectAllExampleComponent implements OnInit, AfterViewInit, OnDestroy {
-  /** list of banks */
-  protected banks: Bank[] = BANKS;
-
   /** control for the selected bank for multi-selection */
   public bankMultiCtrl: FormControl<Bank[]> = new FormControl<Bank[]>([]);
-
   /** control for the MatSelect filter keyword multi-selection */
   public bankMultiFilterCtrl: FormControl<string> = new FormControl<string>('');
-
   /** list of banks filtered by search keyword */
   public filteredBanksMulti: ReplaySubject<Bank[]> = new ReplaySubject<Bank[]>(1);
-
-  /** local copy of filtered banks to help set the toggle all checkbox state */
-  protected filteredBanksCache: Bank[] = [];
-
   /** flags to set the toggle all checkbox state */
   isIndeterminate = false;
   isChecked = false;
-
   @ViewChild('multiSelect', { static: true }) multiSelect: MatSelect;
-
+  /** list of banks */
+  protected banks: Bank[] = BANKS;
+  /** local copy of filtered banks to help set the toggle all checkbox state */
+  protected filteredBanksCache: Bank[] = [];
   /** Subject that emits when the component has been destroyed. */
   protected _onDestroy = new Subject<void>();
 

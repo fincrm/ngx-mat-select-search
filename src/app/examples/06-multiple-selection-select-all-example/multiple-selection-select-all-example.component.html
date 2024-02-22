@@ -1,24 +1,23 @@
-
 <h3>Multiple selection with Select All Checkbox</h3>
 <p>
   <mat-form-field color="accent">
-    <mat-select [formControl]="bankMultiCtrl" placeholder="Banks" [multiple]="true" #multiSelect>
+    <mat-select #multiSelect [formControl]="bankMultiCtrl" [multiple]="true" placeholder="Banks">
       <mat-option>
-        <ngx-mat-select-search [showToggleAllCheckbox]="true"
-                               [toggleAllCheckboxIndeterminate]="isIndeterminate"
-                               [toggleAllCheckboxChecked]="isChecked"
-                               (toggleAll)="toggleSelectAll($event)"
-                               [formControl]="bankMultiFilterCtrl"></ngx-mat-select-search>
+        <ngx-mat-select-search
+          (toggleAll)="toggleSelectAll($event)"
+          [formControl]="bankMultiFilterCtrl"
+          [showToggleAllCheckbox]="true"
+          [toggleAllCheckboxChecked]="isChecked"
+          [toggleAllCheckboxIndeterminate]="isIndeterminate"
+        ></ngx-mat-select-search>
       </mat-option>
       <mat-option *ngFor="let bank of filteredBanksMulti | async" [value]="bank">
-        {{bank.name}}
+        {{ bank.name }}
       </mat-option>
     </mat-select>
   </mat-form-field>
 </p>
-<p>
-  Selected Banks:
-</p>
+<p>Selected Banks:</p>
 <ul *ngFor="let bank of bankMultiCtrl?.value">
-  <li>{{bank.name}}</li>
+  <li>{{ bank.name }}</li>
 </ul>

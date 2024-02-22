@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { MatLegacySelect as MatSelect } from '@angular/material/legacy-select';
+import { MatSelect } from '@angular/material/select';
 import { ReplaySubject, Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 
@@ -12,20 +12,15 @@ import { Bank, BANKS } from '../demo-data';
   styleUrls: ['./single-selection-example.component.scss'],
 })
 export class SingleSelectionExampleComponent implements OnInit, AfterViewInit, OnDestroy {
-  /** list of banks */
-  protected banks: Bank[] = BANKS;
-
   /** control for the selected bank */
   public bankCtrl: FormControl<Bank> = new FormControl<Bank>(null);
-
   /** control for the MatSelect filter keyword */
   public bankFilterCtrl: FormControl<string> = new FormControl<string>('');
-
   /** list of banks filtered by search keyword */
   public filteredBanks: ReplaySubject<Bank[]> = new ReplaySubject<Bank[]>(1);
-
   @ViewChild('singleSelect', { static: true }) singleSelect: MatSelect;
-
+  /** list of banks */
+  protected banks: Bank[] = BANKS;
   /** Subject that emits when the component has been destroyed. */
   protected _onDestroy = new Subject<void>();
 

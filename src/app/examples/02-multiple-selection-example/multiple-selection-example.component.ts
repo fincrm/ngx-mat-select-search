@@ -2,7 +2,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { FormControl } from '@angular/forms';
 import { ReplaySubject, Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
-import { MatLegacySelect as MatSelect } from '@angular/material/legacy-select';
+import { MatSelect } from '@angular/material/select';
 
 import { Bank, BANKS } from '../demo-data';
 
@@ -12,20 +12,15 @@ import { Bank, BANKS } from '../demo-data';
   styleUrls: ['./multiple-selection-example.component.scss'],
 })
 export class MultipleSelectionExampleComponent implements OnInit, AfterViewInit, OnDestroy {
-  /** list of banks */
-  protected banks: Bank[] = BANKS;
-
   /** control for the selected bank for multi-selection */
   public bankMultiCtrl: FormControl<Bank[]> = new FormControl<Bank[]>([]);
-
   /** control for the MatSelect filter keyword multi-selection */
   public bankMultiFilterCtrl: FormControl<string> = new FormControl<string>('');
-
   /** list of banks filtered by search keyword */
   public filteredBanksMulti: ReplaySubject<Bank[]> = new ReplaySubject<Bank[]>(1);
-
   @ViewChild('multiSelect', { static: true }) multiSelect: MatSelect;
-
+  /** list of banks */
+  protected banks: Bank[] = BANKS;
   /** Subject that emits when the component has been destroyed. */
   protected _onDestroy = new Subject<void>();
 

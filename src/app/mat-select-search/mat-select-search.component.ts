@@ -27,7 +27,6 @@ import {
   ElementRef,
   EventEmitter,
   forwardRef,
-  HostBinding,
   Inject,
   Input,
   OnDestroy,
@@ -38,9 +37,9 @@ import {
   ViewChild,
 } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { MatOption, _countGroupLabelsBeforeOption } from '@angular/material/core';
-import { MatLegacyFormField as MatFormField } from '@angular/material/legacy-form-field';
-import { MatLegacySelect as MatSelect } from '@angular/material/legacy-select';
+import { MatOption } from '@angular/material/core';
+import { MatFormField } from '@angular/material/form-field';
+import { MatSelect } from '@angular/material/select';
 import { BehaviorSubject, combineLatest, Observable, of, Subject } from 'rxjs';
 import { delay, filter, map, startWith, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { MatSelectSearchClearDirective } from './mat-select-search-clear.directive';
@@ -51,10 +50,7 @@ import {
 } from './default-options';
 import { MatSelectNoEntriesFoundDirective } from './mat-select-no-entries-found.directive';
 
-/** The max height of the select's overlay panel. */
-const SELECT_PANEL_MAX_HEIGHT = 256;
-
-/* eslint-disable @typescript-eslint/member-ordering, @angular-eslint/component-selector */
+/* tslint:disable:member-ordering component-selector */
 /**
  * Component providing an input field for searching MatSelect options.
  *
@@ -218,20 +214,16 @@ export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValue
   @Output() toggleAll = new EventEmitter<boolean>();
 
   /** Reference to the search input field */
-  @ViewChild('searchSelectInput', { read: ElementRef, static: true })
-  searchSelectInput: ElementRef;
+  @ViewChild('searchSelectInput', { read: ElementRef, static: true }) searchSelectInput: ElementRef;
 
   /** Reference to the search input field */
-  @ViewChild('innerSelectSearch', { read: ElementRef, static: true })
-  innerSelectSearch: ElementRef;
+  @ViewChild('innerSelectSearch', { read: ElementRef, static: true }) innerSelectSearch: ElementRef;
 
   /** Reference to custom search input clear icon */
-  @ContentChild(MatSelectSearchClearDirective)
-  clearIcon: MatSelectSearchClearDirective;
+  @ContentChild(MatSelectSearchClearDirective) clearIcon: MatSelectSearchClearDirective;
 
   /** Reference to custom no entries found element */
-  @ContentChild(MatSelectNoEntriesFoundDirective)
-  noEntriesFound: MatSelectNoEntriesFoundDirective;
+  @ContentChild(MatSelectNoEntriesFoundDirective) noEntriesFound: MatSelectNoEntriesFoundDirective;
   public _options$: BehaviorSubject<QueryList<MatOption>> = new BehaviorSubject<QueryList<MatOption>>(null);
   public _formControl: FormControl<string> = new FormControl<string>('');
   private _lastExternalInputValue: string;
@@ -271,16 +263,9 @@ export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValue
     private _viewportRuler: ViewportRuler,
     @Optional() @Inject(MatOption) public matOption: MatOption = null,
     @Optional() @Inject(MatFormField) public matFormField: MatFormField = null,
-    @Optional()
-    @Inject(MAT_SELECTSEARCH_DEFAULT_OPTIONS)
-    defaultOptions?: MatSelectSearchOptions,
+    @Optional() @Inject(MAT_SELECTSEARCH_DEFAULT_OPTIONS) defaultOptions?: MatSelectSearchOptions,
   ) {
     this.applyDefaultOptions(defaultOptions);
-  }
-
-  @HostBinding('class.mat-select-search-inside-mat-option')
-  get isInsideMatOption(): boolean {
-    return !!this.matOption;
   }
 
   /** Current search value */
@@ -297,25 +282,9 @@ export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValue
     this._options$.next(_options);
   }
 
-  onTouched = () => {
-    //
-  };
+  onTouched: Function = (_: any) => {};
 
   ngOnInit() {
-    // set custom panel class
-    const panelClass = 'mat-select-search-panel';
-    if (this.matSelect.panelClass) {
-      if (Array.isArray(this.matSelect.panelClass)) {
-        (<string[]>this.matSelect.panelClass).push(panelClass);
-      } else if (typeof this.matSelect.panelClass === 'string') {
-        this.matSelect.panelClass = [this.matSelect.panelClass, panelClass];
-      } else if (typeof this.matSelect.panelClass === 'object') {
-        this.matSelect.panelClass[panelClass] = true;
-      }
-    } else {
-      this.matSelect.panelClass = panelClass;
-    }
-
     // set custom mat-option class if the component was placed inside a mat-option
     if (this.matOption) {
       this.matOption.disabled = true;
@@ -343,75 +312,69 @@ export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValue
 
     // set the first item active after the options changed
     this.matSelect.openedChange
-      .pipe(take(1))
-      .pipe(takeUntil(this._onDestroy))
-      .subscribe(() => {
-        if (this.matSelect._keyManager) {
-          this.matSelect._keyManager.change
-            .pipe(takeUntil(this._onDestroy))
-            .subscribe(() => this.adjustScrollTopToFitActiveOptionIntoView());
-        } else {
-          console.log('_keyManager was not initialized.');
-        }
+      .pipe(
+        take(1),
+        switchMap((_) => {
+          this._options = this.matSelect.options;
 
-        this._options = this.matSelect.options;
+          // Closure variable for tracking the most recent first option.
+          // In order to avoid avoid causing the list to
+          // scroll to the top when options are added to the bottom of
+          // the list (eg: infinite scroll), we compare only
+          // the changes to the first options to determine if we
+          // should set the first item as active.
+          // This prevents unnecessary scrolling to the top of the list
+          // when options are appended, but allows the first item
+          // in the list to be set as active by default when there
+          // is no active selection
+          let previousFirstOption = this._options.toArray()[this.getOptionsLengthOffset()];
 
-        // Closure variable for tracking the most recent first option.
-        // In order to avoid avoid causing the list to
-        // scroll to the top when options are added to the bottom of
-        // the list (eg: infinite scroll), we compare only
-        // the changes to the first options to determine if we
-        // should set the first item as active.
-        // This prevents unnecessary scrolling to the top of the list
-        // when options are appended, but allows the first item
-        // in the list to be set as active by default when there
-        // is no active selection
-        let previousFirstOption = this._options.toArray()[this.getOptionsLengthOffset()];
-
-        this._options.changes.pipe(takeUntil(this._onDestroy)).subscribe(() => {
-          // avoid "expression has been changed" error
-          setTimeout(() => {
-            // Convert the QueryList to an array
-            const options = this._options.toArray();
-
-            // The true first item is offset by 1
-            const currentFirstOption = options[this.getOptionsLengthOffset()];
-
-            const keyManager = this.matSelect._keyManager;
-            if (keyManager && this.matSelect.panelOpen) {
-              // set first item active and input width
-
-              // Check to see if the first option in these changes is different from the previous.
-              const firstOptionIsChanged = !this.matSelect.compareWith(
-                previousFirstOption,
-                currentFirstOption,
-              );
-
-              // CASE: The first option is different now.
-              // Indiciates we should set it as active and scroll to the top.
-              if (
-                firstOptionIsChanged ||
-                !keyManager.activeItem ||
-                !options.find((option) => this.matSelect.compareWith(option, keyManager.activeItem))
-              ) {
-                keyManager.setFirstItemActive();
-              }
-
-              // wait for panel width changes
+          return this._options.changes.pipe(
+            tap(() => {
+              // avoid "expression has been changed" error
               setTimeout(() => {
-                this.updateInputWidth();
+                // Convert the QueryList to an array
+                const options = this._options.toArray();
+
+                // The true first item is offset by 1
+                const currentFirstOption = options[this.getOptionsLengthOffset()];
+
+                const keyManager = this.matSelect._keyManager;
+                if (keyManager && this.matSelect.panelOpen && currentFirstOption) {
+                  // set first item active and input width
+
+                  // Check to see if the first option in these changes is different from the previous.
+                  const firstOptionIsChanged =
+                    !previousFirstOption ||
+                    !this.matSelect.compareWith(previousFirstOption.value, currentFirstOption.value);
+
+                  // CASE: The first option is different now.
+                  // Indiciates we should set it as active and scroll to the top.
+                  if (
+                    firstOptionIsChanged ||
+                    !keyManager.activeItem ||
+                    !options.find((option) =>
+                      this.matSelect.compareWith(option.value, keyManager.activeItem.value),
+                    )
+                  ) {
+                    keyManager.setActiveItem(this.getOptionsLengthOffset());
+                  }
+
+                  // wait for panel width changes
+                  setTimeout(() => {
+                    this.updateInputWidth();
+                  });
+                }
+
+                // Update our reference
+                previousFirstOption = currentFirstOption;
               });
-
-              if (!this.disableScrollToActiveOnOptionsChanged) {
-                this.adjustScrollTopToFitActiveOptionIntoView();
-              }
-            }
-
-            // Update our reference
-            previousFirstOption = currentFirstOption;
-          });
-        });
-      });
+            }),
+          );
+        }),
+      )
+      .pipe(takeUntil(this._onDestroy))
+      .subscribe();
 
     // add or remove css class depending on whether to show the no entries found message
     // note: this is hacky
@@ -524,7 +487,7 @@ export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValue
       .subscribe(fn);
   }
 
-  registerOnTouched(fn: () => void) {
+  registerOnTouched(fn: Function) {
     this.onTouched = fn;
   }
 
@@ -583,7 +546,7 @@ export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValue
       return;
     }
     for (const key of configurableDefaultOptions) {
-      if (key in defaultOptions) {
+      if (defaultOptions.hasOwnProperty(key)) {
         (this[key] as any) = defaultOptions[key];
       }
     }
@@ -641,47 +604,6 @@ export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValue
         this.matSelect._onChange(values);
       }
     });
-  }
-
-  /**
-   * Scrolls the currently active option into the view if it is not yet visible.
-   */
-  private adjustScrollTopToFitActiveOptionIntoView(): void {
-    if (this.matSelect.panel && this.matSelect.options.length > 0) {
-      const matOptionHeight = this.getMatOptionHeight();
-      const activeOptionIndex = this.matSelect._keyManager.activeItemIndex || 0;
-      const labelCount = _countGroupLabelsBeforeOption(
-        activeOptionIndex,
-        this.matSelect.options,
-        this.matSelect.optionGroups,
-      );
-      // If the component is in a MatOption, the activeItemIndex will be offset by one.
-      const indexOfOptionToFitIntoView = (this.matOption ? -1 : 0) + labelCount + activeOptionIndex;
-      const currentScrollTop = this.matSelect.panel.nativeElement.scrollTop;
-
-      const searchInputHeight = this.innerSelectSearch.nativeElement.offsetHeight;
-      const amountOfVisibleOptions = Math.floor(
-        (SELECT_PANEL_MAX_HEIGHT - searchInputHeight) / matOptionHeight,
-      );
-
-      const indexOfFirstVisibleOption =
-        Math.round((currentScrollTop + searchInputHeight) / matOptionHeight) - 1;
-
-      if (indexOfFirstVisibleOption >= indexOfOptionToFitIntoView) {
-        this.matSelect.panel.nativeElement.scrollTop = indexOfOptionToFitIntoView * matOptionHeight;
-      } else if (indexOfFirstVisibleOption + amountOfVisibleOptions <= indexOfOptionToFitIntoView) {
-        this.matSelect.panel.nativeElement.scrollTop =
-          (indexOfOptionToFitIntoView + 1) * matOptionHeight - (SELECT_PANEL_MAX_HEIGHT - searchInputHeight);
-      }
-    }
-  }
-
-  private getMatOptionHeight(): number {
-    if (this.matSelect.options.length > 0) {
-      return this.matSelect.options.first._getHostElement().getBoundingClientRect().height;
-    }
-
-    return 0;
   }
 
   /**

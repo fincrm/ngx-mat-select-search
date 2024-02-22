@@ -10,6 +10,6 @@ import { Directive } from '@angular/core';
  * </ngx-mat-select-search>
  */
 @Directive({
-  selector: '[ngxMatSelectNoEntriesFound]'
+  selector: '[ngxMatSelectNoEntriesFound]',
 })
 export class MatSelectNoEntriesFoundDirective {}

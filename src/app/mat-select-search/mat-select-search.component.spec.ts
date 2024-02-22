@@ -10,15 +10,10 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field';
-import {
-  MatLegacySelect as MatSelect,
-  MatLegacySelectModule as MatSelectModule,
-} from '@angular/material/legacy-select';
-import { ReplaySubject } from 'rxjs';
-import { Subject } from 'rxjs';
-import { delay, take } from 'rxjs/operators';
-import { takeUntil } from 'rxjs/operators';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelect, MatSelectModule } from '@angular/material/select';
+import { ReplaySubject, Subject } from 'rxjs';
+import { delay, take, takeUntil } from 'rxjs/operators';
 
 import { MatSelectSearchComponent } from './mat-select-search.component';
 import { NgxMatSelectSearchModule } from './ngx-mat-select-search.module';
@@ -26,11 +21,12 @@ import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { DOWN_ARROW } from '@angular/cdk/keycodes';
 import { MAT_SELECTSEARCH_DEFAULT_OPTIONS, MatSelectSearchOptions } from './default-options';
 
-/* eslint-disable @angular-eslint/component-selector */
+/* tslint:disable:component-selector */
 
 interface Bank {
   id: string;
   name: string;
+  bic: { value: string };
 }
 
 @Component({
@@ -112,13 +108,10 @@ export class MatSelectSearchTestComponent implements OnInit, OnDestroy, AfterVie
 
   // list of banks
   public banks: Bank[] = [
-    { name: 'Bank A', id: 'A' },
-    { name: 'Bank B', id: 'B' },
-    {
-      name: 'Bank C',
-      id: 'C',
-    },
-    { name: 'Bank DC', id: 'DC' },
+    { name: 'Bank A', id: 'A', bic: { value: '102' } },
+    { name: 'Bank B', id: 'B', bic: { value: '203' } },
+    { name: 'Bank C', id: 'C', bic: { value: '304' } },
+    { name: 'Bank DC', id: 'DC', bic: { value: '405' } },
   ];
 
   public filteredBanks: ReplaySubject<Bank[]> = new ReplaySubject<Bank[]>(1);
@@ -460,6 +453,62 @@ describe('MatSelectSearchComponent', () => {
                   expect(component.matSelectMatOption.options.length).toBe(5);
 
                   done();
+                });
+              });
+            });
+          });
+        });
+      });
+
+      it('should compare first option changed by value of "bic"', (done) => {
+        component.matSelectMatOption.compareWith = (b1: Bank, b2: Bank) => b1.bic.value === b2.bic.value;
+
+        component.filteredBanksMatOption.pipe(take(1), delay(1)).subscribe(() => {
+          // when the filtered banks are initialized
+          fixture.detectChanges();
+
+          component.matSelectMatOption.open();
+          fixture.detectChanges();
+
+          component.matSelectMatOption.openedChange.pipe(take(1)).subscribe((opened) => {
+            expect(opened).toBe(true);
+            const searchField = document.querySelector('.mat-select-search-inner .mat-select-search-input');
+            expect(searchField).toBeTruthy();
+
+            expect(component.matSelectMatOption.options.length).toBe(5);
+
+            // search for "c"
+            component.matSelectSearchMatOption._formControl.setValue('c');
+            fixture.detectChanges();
+
+            expect(component.bankFilterCtrlMatOption.value).toBe('c');
+            expect(component.matSelectMatOption.panelOpen).toBe(true);
+
+            component.filteredBanks.pipe(take(1)).subscribe(() => {
+              fixture.detectChanges();
+
+              setTimeout(() => {
+                expect(component.matSelectMatOption.options.length).toBe(3);
+                expect(component.matSelectMatOption.options.toArray()[1].value.id).toBe('C');
+                expect(component.matSelectMatOption.options.toArray()[1].active).toBe(true, 'first active');
+
+                // search for DC
+                component.matSelectSearchMatOption._formControl.setValue('DC');
+                fixture.detectChanges();
+
+                component.filteredBanks.pipe(take(1)).subscribe(() => {
+                  fixture.detectChanges();
+
+                  setTimeout(() => {
+                    expect(component.matSelectMatOption.options.length).toBe(2);
+                    expect(component.matSelectMatOption.options.toArray()[1].value.id).toBe('DC');
+                    expect(component.matSelectMatOption.options.toArray()[1].active).toBe(
+                      true,
+                      'first active',
+                    );
+
+                    done();
+                  });
                 });
               });
             });
