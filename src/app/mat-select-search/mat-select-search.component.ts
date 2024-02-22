@@ -35,6 +35,7 @@ import {
   Output,
   QueryList,
   ViewChild,
+  input,
 } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatLegacyOption as MatOption } from '@angular/material/legacy-core';
@@ -143,6 +144,9 @@ import { MatSelectNoEntriesFoundDirective } from './mat-select-no-entries-found.
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValueAccessor {
+  autocomplete = input<'on' | 'off'>('on');
+  spinnerDiameter = input<number>(20);
+
   /** Label of the search placeholder */
   @Input() placeholderLabel = 'Suche';
 
@@ -159,7 +163,7 @@ export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValue
   @Input() noEntriesFoundLabel = 'Keine Optionen gefunden';
 
   /**
-   * Whether or not the search field should be cleared after the dropdown menu is closed.
+   * Whether the search field should be cleared after the dropdown menu is closed.
    * Useful for server-side filtering. See [#3](https://github.com/bithost-gmbh/ngx-mat-select-search/issues/3)
    */
   @Input() clearSearchInput = true;
@@ -214,7 +218,7 @@ export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValue
   @Output() toggleAll = new EventEmitter<boolean>();
 
   /** Reference to the search input field */
-  @ViewChild('searchSelectInput', { read: ElementRef, static: true }) searchSelectInput: ElementRef;
+  @ViewChild('selectSearchInput', { read: ElementRef, static: true }) selectSearchInput: ElementRef;
 
   /** Reference to the search input field */
   @ViewChild('innerSelectSearch', { read: ElementRef, static: true }) innerSelectSearch: ElementRef;
@@ -224,6 +228,7 @@ export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValue
 
   /** Reference to custom no entries found element */
   @ContentChild(MatSelectNoEntriesFoundDirective) noEntriesFound: MatSelectNoEntriesFoundDirective;
+
   public _options$: BehaviorSubject<QueryList<MatOption>> = new BehaviorSubject<QueryList<MatOption>>(null);
   public _formControl: FormControl<string> = new FormControl<string>('');
   private _lastExternalInputValue: string;
@@ -288,7 +293,7 @@ export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValue
     // set custom mat-option class if the component was placed inside a mat-option
     if (this.matOption) {
       this.matOption.disabled = true;
-      this.matOption._getHostElement().classList.add('contains-mat-select-search');
+      this.matOption._getHostElement().classList.add('mat-select-search');
       this.matOption._getHostElement().setAttribute('aria-hidden', 'true');
     } else {
       console.error('<ngx-mat-select-search> must be placed inside a <mat-option> element');
@@ -461,7 +466,7 @@ export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValue
         this.unselectActiveDescendant();
         this.activeDescendant = this._options.toArray()[index]._getHostElement();
         this.activeDescendant.setAttribute('aria-selected', 'true');
-        this.searchSelectInput.nativeElement.setAttribute('aria-activedescendant', ariaActiveDescendantId);
+        this.selectSearchInput.nativeElement.setAttribute('aria-activedescendant', ariaActiveDescendantId);
       }
     }
   }
@@ -495,7 +500,7 @@ export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValue
    * Focuses the search input field
    */
   public _focus() {
-    if (!this.searchSelectInput || !this.matSelect.panel) {
+    if (!this.selectSearchInput || !this.matSelect.panel) {
       return;
     }
     // save and restore scrollTop of panel, since it will be reset by focus()
@@ -504,7 +509,7 @@ export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValue
     const scrollTop = panel.scrollTop;
 
     // focus
-    this.searchSelectInput.nativeElement.focus();
+    this.selectSearchInput.nativeElement.focus();
 
     panel.scrollTop = scrollTop;
   }
@@ -619,6 +624,6 @@ export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValue
 
   private unselectActiveDescendant() {
     this.activeDescendant?.removeAttribute('aria-selected');
-    this.searchSelectInput.nativeElement.removeAttribute('aria-activedescendant');
+    this.selectSearchInput.nativeElement.removeAttribute('aria-activedescendant');
   }
 }
