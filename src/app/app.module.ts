@@ -3,11 +3,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatLegacyButton as MatButtonModule } from '@angular/material/legacy-button';
+import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
 import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
-import { MatLegacyButtonModule as MatToolbarModule } from '@angular/material/legacy-button';
 
 import { NgxMatSelectSearchModule } from './mat-select-search/ngx-mat-select-search.module';
 
@@ -22,6 +21,7 @@ import { TooltipSelectAllExampleComponent } from './examples/07-tooltip-select-a
 import { InfiniteScrollExampleComponent } from './examples/08-infinite-scroll-example/infinite-scroll-example.component';
 import { CustomNoEntriesFoundExampleComponent } from './examples/09-custom-no-entries-found-example/custom-no-entries-found-example.component';
 import { MatLegacySlideToggleModule as MatSlideToggleModule } from '@angular/material/legacy-slide-toggle';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 /**
  * NgModule that includes all Material modules that are required to serve the app.
