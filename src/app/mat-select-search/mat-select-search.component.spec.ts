@@ -11,7 +11,10 @@ import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelect, MatSelectModule } from '@angular/material/select';
+import {
+  MatLegacySelect as MatSelect,
+  MatLegacySelectModule as MatSelectModule,
+} from '@angular/material/legacy-select';
 import { ReplaySubject, Subject } from 'rxjs';
 import { delay, take, takeUntil } from 'rxjs/operators';
 
@@ -302,6 +305,7 @@ describe('MatSelectSearchComponent', () => {
       });
     });
 
+    // tslint:disable-next-line:max-line-length
     it('should filter the options available and hightlight the first option in the list, filter the options by input "c" and reset the list', (done) => {
       component.filteredBanks.pipe(take(1), delay(1)).subscribe(() => {
         // when the filtered banks are initialized
@@ -364,7 +368,7 @@ describe('MatSelectSearchComponent', () => {
         component.matSelect.open();
         fixture.detectChanges();
 
-        component.matSelect.openedChange.pipe(take(1)).subscribe((opened) => {
+        component.matSelect.openedChange.pipe(take(1)).subscribe(() => {
           // search for "something definitely not in the list"
           component.matSelectSearch._formControl.setValue('something definitely not in the list');
           fixture.detectChanges();
@@ -546,6 +550,7 @@ describe('MatSelectSearchComponent', () => {
       });
     }));
 
+    // tslint:disable-next-line:max-line-length
     it('set the initial selection with multi=true and filter the options available, filter the options by input "c" and select an option', waitForAsync((
       done,
     ) => {
@@ -697,7 +702,7 @@ describe('MatSelectSearchComponent with default options', () => {
       component.matSelect.open();
       fixture.detectChanges();
 
-      component.matSelect.openedChange.pipe(take(1), delay(1)).subscribe((opened) => {
+      component.matSelect.openedChange.pipe(take(1), delay(1)).subscribe(() => {
         const searchField = document.querySelector(
           '.mat-select-search-inner .mat-select-search-input',
         ) as HTMLInputElement;

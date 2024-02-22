@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { combineLatest, merge, Observable, Subject } from 'rxjs';
 import { map, mapTo, scan, startWith } from 'rxjs/operators';
-import { MatSelect } from '@angular/material/select';
+import { MatLegacySelect as MatSelect } from '@angular/material/legacy-select';
 import { Bank } from '../demo-data';
 
 /**
@@ -47,7 +47,7 @@ export class InfiniteScrollExampleComponent implements OnInit, OnDestroy {
     this.filteredData$,
     this.bankFilterCtrl.valueChanges,
   ]).pipe(
-    map(([filteredData, searchValue]) => {
+    map(([filteredData]) => {
       if (!this.bankFilterCtrl.value && this.bankCtrl.value) {
         const index = filteredData.findIndex((bank) => bank.id === this.bankCtrl.value);
         return index + this.batchSize;
