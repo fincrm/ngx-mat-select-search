@@ -143,6 +143,8 @@ import { MatSelectNoEntriesFoundDirective } from './mat-select-no-entries-found.
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValueAccessor {
+  @Input() autocomplete: 'on' | 'off' = 'on';
+
   /** Label of the search placeholder */
   @Input() placeholderLabel = 'Suche';
 
@@ -314,7 +316,6 @@ export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValue
     // when the select dropdown panel is opened or closed
     this.matSelect.openedChange.pipe(delay(1), takeUntil(this._onDestroy)).subscribe((opened) => {
       if (opened) {
-        this.updateInputWidth();
         // focus the search field when opening
         if (!this.disableInitialFocus) {
           this._focus();
@@ -376,11 +377,6 @@ export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValue
                   ) {
                     keyManager.setActiveItem(this.getOptionsLengthOffset());
                   }
-
-                  // wait for panel width changes
-                  setTimeout(() => {
-                    this.updateInputWidth();
-                  });
                 }
 
                 // Update our reference
@@ -405,16 +401,6 @@ export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValue
         }
       }
     });
-
-    // resize the input width when the viewport is resized, i.e. the trigger width could potentially be resized
-    this._viewportRuler
-      .change()
-      .pipe(takeUntil(this._onDestroy))
-      .subscribe(() => {
-        if (this.matSelect.panelOpen) {
-          this.updateInputWidth();
-        }
-      });
 
     this.initMultipleHandling();
 
@@ -589,27 +575,6 @@ export class MatSelectSearchComponent implements OnInit, OnDestroy, ControlValue
         this.matSelect._onChange(values);
       }
     });
-  }
-
-  /**
-   *  Set the width of the innerSelectSearch to fit even custom scrollbars
-   *  And support all Operation Systems
-   */
-  public updateInputWidth() {
-    if (!this.innerSelectSearch || !this.innerSelectSearch.nativeElement) {
-      return;
-    }
-    let element: HTMLElement = this.innerSelectSearch.nativeElement;
-    let panelElement: HTMLElement;
-    while ((element = element.parentElement)) {
-      if (element.classList.contains('mat-select-panel')) {
-        panelElement = element;
-        break;
-      }
-    }
-    if (panelElement) {
-      this.innerSelectSearch.nativeElement.style.width = panelElement.clientWidth + 'px';
-    }
   }
 
   /**
