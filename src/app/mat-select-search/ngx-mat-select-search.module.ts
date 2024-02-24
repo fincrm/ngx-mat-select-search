@@ -7,11 +7,11 @@
 
 import { NgModule } from '@angular/core';
 import { MatSelectSearchComponent } from './mat-select-search.component';
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
-import { MatLegacyCheckboxModule as MatCheckboxModule } from '@angular/material/legacy-checkbox';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
-import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
-import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { CommonModule } from '@angular/common';
 
 import { MatSelectSearchClearDirective } from './mat-select-search-clear.directive';
@@ -34,7 +34,16 @@ export { MatSelectNoEntriesFoundDirective };
     MatTooltipModule,
     MatDividerModule,
   ],
-  declarations: [MatSelectSearchComponent, MatSelectSearchClearDirective, MatSelectNoEntriesFoundDirective],
-  exports: [MatSelectSearchComponent, MatSelectSearchClearDirective, MatSelectNoEntriesFoundDirective],
+  declarations: [
+    MatSelectSearchComponent,
+    MatSelectSearchClearDirective,
+    MatSelectNoEntriesFoundDirective
+  ],
+  exports: [
+    MatSelectSearchComponent,
+    MatSelectSearchClearDirective,
+    MatSelectNoEntriesFoundDirective
+  ]
 })
-export class NgxMatSelectSearchModule {}
+export class NgxMatSelectSearchModule {
+}

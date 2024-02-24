@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { combineLatest, merge, Observable, Subject } from 'rxjs';
 import { map, mapTo, scan, startWith } from 'rxjs/operators';
-import { MatLegacySelect as MatSelect } from '@angular/material/legacy-select';
+import { MatSelect } from '@angular/material/select';
 import { Bank } from '../demo-data';
 
 /**
@@ -11,57 +11,67 @@ import { Bank } from '../demo-data';
 @Component({
   selector: 'app-infinite-scroll-example',
   templateUrl: './infinite-scroll-example.component.html',
-  styleUrls: ['./infinite-scroll-example.component.scss'],
+  styleUrls: ['./infinite-scroll-example.component.scss']
 })
 export class InfiniteScrollExampleComponent implements OnInit, OnDestroy {
-  @ViewChild('matSelectInfiniteScroll', { static: true })
+
+  @ViewChild('matSelectInfiniteScroll', { static: true } )
   infiniteScrollSelect: MatSelect;
-  /** control for the selected bank id */
-  public bankCtrl: FormControl<string> = new FormControl<string>(null);
-  /** control for the MatSelect filter keyword */
-  public bankFilterCtrl: FormControl<string> = new FormControl<string>('');
-  /** number of items added per batch */
-  batchSize = 20;
+
   /** list with all available data, mocks some sort of backend data source */
   private mockBankList: Bank[] = Array.from({ length: 1000 }).map((_, i) => ({
     id: String(i),
-    name: `Bank ${i}`,
+    name: `Bank ${i}`
   }));
+
+  /** control for the selected bank id */
+  public bankCtrl: FormControl<string> = new FormControl<string>(null);
+
+  /** control for the MatSelect filter keyword */
+  public bankFilterCtrl: FormControl<string> = new FormControl<string>('');
+
   /** list of data corresponding to the search input */
   private filteredData$: Observable<Bank[]> = this.bankFilterCtrl.valueChanges.pipe(
     startWith(''),
-    map((searchKeyword) => {
+    map(searchKeyword => {
       if (!searchKeyword) {
         return this.mockBankList;
       }
-      return this.mockBankList.filter(
-        (bank) => bank.name.toLowerCase().indexOf(searchKeyword.toLowerCase()) > -1,
+      return this.mockBankList.filter((bank) =>
+        bank.name.toLowerCase().indexOf(searchKeyword.toLowerCase()) > -1
       );
-    }),
+    })
   );
+
+  /** number of items added per batch */
+  batchSize = 20;
+
   private incrementBatchOffset$: Subject<void> = new Subject<void>();
   private resetBatchOffset$: Subject<void> = new Subject<void>();
 
   /** minimum offset needed for the batch to ensure the selected option is displayed */
   private minimumBatchOffset$: Observable<number> = combineLatest([
     this.filteredData$,
-    this.bankFilterCtrl.valueChanges,
+    this.bankFilterCtrl.valueChanges
   ]).pipe(
-    map(([filteredData]) => {
+    map(([filteredData, searchValue]) => {
       if (!this.bankFilterCtrl.value && this.bankCtrl.value) {
-        const index = filteredData.findIndex((bank) => bank.id === this.bankCtrl.value);
+        const index = filteredData.findIndex(bank => bank.id === this.bankCtrl.value);
         return index + this.batchSize;
       } else {
         return 0;
       }
     }),
-    startWith(0),
+    startWith(0)
   );
 
   /** length of the visible data / start of the next batch */
   private batchOffset$ = combineLatest([
-    merge(this.incrementBatchOffset$.pipe(mapTo(true)), this.resetBatchOffset$.pipe(mapTo(false))),
-    this.minimumBatchOffset$,
+    merge(
+      this.incrementBatchOffset$.pipe(mapTo(true)),
+      this.resetBatchOffset$.pipe(mapTo(false))
+    ),
+    this.minimumBatchOffset$
   ]).pipe(
     scan((batchOffset, [doIncrement, minimumOffset]) => {
       if (doIncrement) {
@@ -72,14 +82,18 @@ export class InfiniteScrollExampleComponent implements OnInit, OnDestroy {
     }, this.batchSize),
   );
 
+
   /** list of data, filtered by the search keyword, limited to the length accumulated by infinity scrolling */
-  filteredBatchedData$: Observable<Bank[]> = combineLatest([this.filteredData$, this.batchOffset$]).pipe(
-    map(([filteredData, batchOffset]) => filteredData.slice(0, batchOffset)),
+  filteredBatchedData$: Observable<Bank[]> = combineLatest([
+    this.filteredData$,
+    this.batchOffset$
+  ]).pipe(
+    map(([filteredData, batchOffset]) => filteredData.slice(0, batchOffset))
   );
 
   private destroy$: Subject<void> = new Subject<void>();
 
-  constructor() {}
+  constructor() { }
 
   ngOnInit() {
     /*this.infiniteScrollSelect.openedChange.pipe(takeUntil(this.destroy$)).subscribe(opened => {
@@ -100,4 +114,5 @@ export class InfiniteScrollExampleComponent implements OnInit, OnDestroy {
   getNextBatch(): void {
     this.incrementBatchOffset$.next();
   }
+
 }

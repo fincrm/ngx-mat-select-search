@@ -5,39 +5,49 @@ import { takeUntil } from 'rxjs/operators';
 
 import { Bank, BankGroup, BANKGROUPS } from '../demo-data';
 
+
 @Component({
   selector: 'app-option-groups-example',
   templateUrl: './option-groups-example.component.html',
-  styleUrls: ['./option-groups-example.component.scss'],
+  styleUrls: ['./option-groups-example.component.scss']
 })
 export class OptionGroupsExampleComponent implements OnInit, OnDestroy {
-  /** control for the selected bank for option groups */
-  public bankGroupsCtrl: FormControl<Bank> = new FormControl<Bank>(null);
-  /** control for the MatSelect filter keyword for option groups */
-  public bankGroupsFilterCtrl: FormControl<string> = new FormControl<string>('');
-  /** list of bank groups filtered by search keyword for option groups */
-  public filteredBankGroups: ReplaySubject<BankGroup[]> = new ReplaySubject<BankGroup[]>(1);
+
   /** list of bank groups */
   protected bankGroups: BankGroup[] = BANKGROUPS;
+
+  /** control for the selected bank for option groups */
+  public bankGroupsCtrl: FormControl<Bank> = new FormControl<Bank>(null);
+
+  /** control for the MatSelect filter keyword for option groups */
+  public bankGroupsFilterCtrl: FormControl<string> = new FormControl<string>('');
+
+  /** list of bank groups filtered by search keyword for option groups */
+  public filteredBankGroups: ReplaySubject<BankGroup[]> = new ReplaySubject<BankGroup[]>(1);
+
   /** Subject that emits when the component has been destroyed. */
   protected _onDestroy = new Subject<void>();
 
-  constructor() {}
+
+  constructor() { }
 
   ngOnInit() {
     // load the initial bank list
     this.filteredBankGroups.next(this.copyBankGroups(this.bankGroups));
 
     // listen for search field value changes
-    this.bankGroupsFilterCtrl.valueChanges.pipe(takeUntil(this._onDestroy)).subscribe(() => {
-      this.filterBankGroups();
-    });
+    this.bankGroupsFilterCtrl.valueChanges
+      .pipe(takeUntil(this._onDestroy))
+      .subscribe(() => {
+        this.filterBankGroups();
+      });
   }
 
   ngOnDestroy() {
     this._onDestroy.next();
     this._onDestroy.complete();
   }
+
 
   protected filterBankGroups() {
     if (!this.bankGroups) {
@@ -54,22 +64,22 @@ export class OptionGroupsExampleComponent implements OnInit, OnDestroy {
     }
     // filter the banks
     this.filteredBankGroups.next(
-      bankGroupsCopy.filter((bankGroup) => {
+      bankGroupsCopy.filter(bankGroup => {
         const showBankGroup = bankGroup.name.toLowerCase().indexOf(search) > -1;
         if (!showBankGroup) {
-          bankGroup.banks = bankGroup.banks.filter((bank) => bank.name.toLowerCase().indexOf(search) > -1);
+          bankGroup.banks = bankGroup.banks.filter(bank => bank.name.toLowerCase().indexOf(search) > -1);
         }
         return bankGroup.banks.length > 0;
-      }),
+      })
     );
   }
 
   protected copyBankGroups(bankGroups: BankGroup[]) {
     const bankGroupsCopy = [];
-    bankGroups.forEach((bankGroup) => {
+    bankGroups.forEach(bankGroup => {
       bankGroupsCopy.push({
         name: bankGroup.name,
-        banks: bankGroup.banks.slice(),
+        banks: bankGroup.banks.slice()
       });
     });
     return bankGroupsCopy;
